@@ -1,6 +1,7 @@
 Hello World
 <script src='https://d3js.org/d3.v5.min.js'></script>
-<style> circle {fill: red; stroke: black;} </style>
+<style> circle {fill: green; stroke: black;}
+        .inflationCircle {fill: red; stroke: black;}</style>
 <body onload='init()'>
 <svg width=950 height=950>
 </svg>
@@ -36,6 +37,28 @@ svg.append('g')
   .attr('stroke-width', 2)
   .attr('d', line);
 
+svg.append('g')
+.attr('transform', 'translate(80,50)')
+.selectAll('.inflationCircle')
+.data(data).enter().append('circle')
+.attr('class','inflationCircle')
+.attr("cx", function(d,i) { return x(+d.Year);})
+.attr("cy", function(d,i) { return y(+d["GasolinePriceAdjustedforInflation(2023$/gallon)"]);})
+.attr("r", 4);
+
+const inflationLine = d3.line()
+  .x(d => x(+d.Year))
+  .y(d => y(+d["GasolinePriceAdjustedforInflation(2023$/gallon)"]));
+
+svg.append('g')
+  .attr('transform', 'translate(80,50)')
+  .append('path')
+  .datum(data)
+  .attr('fill', 'none')
+  .attr('stroke', 'red')
+  .attr('stroke-width', 2)
+  .attr('d', inflationLine);
+
 
 svg.append("g")
 .attr("transform","translate("+80+","+50+")")
@@ -43,7 +66,7 @@ svg.append("g")
 
 svg.append("g")
 .attr("transform","translate("+80+","+850+")")
-.call(d3.axisBottom(x).tickValues([1950,1970,1990,2010,2023]).tickFormat(d3.format("d")));
+.call(d3.axisBottom(x).tickValues([1950,1960,1970,1980,1990,2000,2010,2020,2023]).tickFormat(d3.format("d")));
 
 svg.append("text")
   .attr("transform", "translate(30,480) rotate(-90)")
