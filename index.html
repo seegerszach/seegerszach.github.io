@@ -1,5 +1,6 @@
 <html>
 <script src='https://d3js.org/d3.v5.min.js'></script>
+<script src="https://github.com/susielu/d3-annotation/blob/master/d3-annotation.min.js"></script>
 <style> circle {fill: green; stroke: black;}
         .inflationCircle {fill: red; stroke: black;}
         [name="tooltip"] {
@@ -14,7 +15,7 @@
 }</style>
 <body onload='init()'>
 <div style="position: absolute; top: 400px; left: 750px;">
-  <button onclick="showNext()" id="showNext">Click To Show The Next 10 Years Of Gas Data</button>
+  <button onclick="showNext()" id="showNext">Click To Show The Next Range Of Gas Data</button>
 </div>
 <div style="position: absolute; top: 450px; left: 750px;">
   <button onclick="restartVisualization()">Click To Restart Visualization</button>
@@ -302,6 +303,13 @@ function showNext() {
   displayYearRange(startYear,endYear);
 
 
+  // add annotations
+  if (currentIndex == 0) 
+  {
+    addAnnotations();
+  }
+
+
   currentIndex += chunkSize;
 
   if (currentIndex == 80) 
@@ -329,7 +337,7 @@ function restartVisualization()
 
   // reset the button
   d3.select("#showNext")
-    .text("Click To Show The Next 10 Years Of Gas Data")
+    .text("Click To Show The Next Range Of Gas Data")
     .style("opacity", 1)
     .attr("disabled", null); 
 }
@@ -450,7 +458,37 @@ function displayAll()
 
 }
 // Add the annotations
+function addAnnotations() {
+  const annotations = [
+    {
+      note: {
+        label: "The 1973 oil crisis led to a significant spike in gasoline prices.",
+        title: "1973 Oil Crisis",
+      },
+      x: x(1973),
+      y: y(1.5),
+      dy: -50,
+      dx: 50,
+    },
+    {
+      note: {
+        label: "The 2008 financial crisis caused a temporary spike in gasoline prices.",
+        title: "2008 Financial Crisis",
+      },
+      x: x(2008),
+      y: y(4.0),
+      dy: -50,
+      dx: -50,
+    }
+  ];
 
+  const makeAnnotations = d3.annotation()
+    .annotations(annotations);
+
+  svg.append("g")
+    .attr("class", "annotation-group")
+    .call(makeAnnotations);
+}
 </script>
 </body>
 </html>
