@@ -1,1 +1,15 @@
 Data Source: https://afdc.energy.gov/data/10641
+
+
+Annotations notes:
+
+Gasoline price spikes in 1974 and 1980 caused by the 
+Organization of the Petroleum Exporting Countries (OPEC) Oil Embargo and Iran-Iraq War
+
+The economic recession caused a price crash in 2009 after a peak in 2008
+
+Oil prices peaked in 2012 as a result of high global demand and increasingly costly extraction methods.
+
+dropped in 2020 because of decreased demand related to the COVID-19 pandemic but rebounded in 2021. 
+
+In 2022, prices reached the highest point since 2014 and then dropped $0.72 in 2023.
