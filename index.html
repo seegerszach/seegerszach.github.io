@@ -40,27 +40,6 @@ const t = d3.transition()
   .duration(7500)
   .ease(d3.easeLinear);
 
-//svg.append('g')
-//.attr('transform', 'translate(80,50)')
-//.selectAll('circle')
-//.data().enter().append('circle')
-//.attr("cx", function(d,i) { return x(+d.Year);})
-//.attr("cy", function(d,i) { return y(+d.GasolinePrice);})
-//.attr("r", 4);
-
-//const line = d3.line()
-//  .x(d => x(+d.Year))
-//  .y(d => y(+d.GasolinePrice));
-
-//svg.append('g')
-//  .attr('transform', 'translate(80,50)')
-//  .append('path')
-//  .datum()
-//  .attr('fill', 'none')
-//  .attr('stroke', 'purple')
-//  .attr('stroke-width', 2)
-//  .attr('d', line);
-
 svg.append("g")
 .attr("transform","translate("+80+","+50+")")
 .call(d3.axisLeft(y).tickValues([0.1,0.5,1,3,4.5]).tickFormat(d3.format("$.2f")));
@@ -80,6 +59,13 @@ svg.append("text")
 svg.append("text")
   .attr("transform", "translate(380,20)")
   .text("Gasoline Prices Since 1950");
+
+svg.append("text")
+  .attr("x", 745)
+  .attr("y", 500)
+  .style("font-family", "Arial")
+  .style("font-size", "10px")
+  .text("Note: Hover over active data for added details");
 
 }
 
@@ -286,17 +272,24 @@ function showNext() {
   console.log(currentIndex);
   console.log(data.length);
 
+  // use this so we can step through the chart
+  let previousData = data.slice(0, currentIndex + chunkSize);
+  let currentData = data.slice(currentIndex, currentIndex + chunkSize);
+
   if (currentIndex >= data.length) 
   {
-  return;
+    previousData = data;
+    currentData = data;
   }
 
-  // use this so we can step through the chart
-  const previousData = data.slice(0, currentIndex + chunkSize);
-  const currentData = data.slice(currentIndex, currentIndex + chunkSize);
+  let startYear = currentData[0].Year;
+  let endYear   = currentData[currentData.length - 1].Year;
 
-  const startYear = currentData[0].Year;
-  const endYear   = currentData[currentData.length - 1].Year;
+  if (currentIndex >= data.length) 
+  {
+    startYear = "1950";
+    endYear = "2023";
+  }
 
   // remove them so we only apply to the latest
   svg.selectAll(".dataGroup").remove();
@@ -311,10 +304,16 @@ function showNext() {
 
   currentIndex += chunkSize;
 
-  if (currentIndex >= 74) 
+  if (currentIndex == 80) 
   {
     d3.select("#showNext")
-    .text("At the end of the visualization")
+    .text("Click To Show 1950-2023");
+
+  }
+  else if (currentIndex > 80)
+  {
+    d3.select("#showNext")
+    .style("opacity", 0)
     .attr("disabled", true);
   }
 }
@@ -331,6 +330,7 @@ function restartVisualization()
   // reset the button
   d3.select("#showNext")
     .text("Click To Show The Next 10 Years Of Gas Data")
+    .style("opacity", 1)
     .attr("disabled", null); 
 }
 
@@ -340,13 +340,115 @@ function displayYearRange(startYear,endYear)
 
   svg.append("text")
   .attr("class", "yearLabel")
-  .attr("x", 740)
+  .attr("x", 150)
   .attr("y", 150)
   .style("font-family", "Arial")
   .style("font-size", "24px")
   .text(startYear + "-" + endYear);
 }
 
+function displayAll()
+{
+  const group = svg.append('g')
+    .attr('class', 'dataGroup')
+    .attr('transform', 'translate(80,50)');
+
+  group.selectAll('.redcircle')
+    .data(data)
+    .enter()
+    .append('circle')
+    .attr("class", "redcircle")
+    .attr('cx', function(d){ return x(+d.Year);})
+    .attr('cy', function(d){ return y(+d["GasolinePriceAdjustedforInflation(2023$/gallon)"]);})
+    .attr('r', 4)
+    .style('fill', 'red')
+    .style('opacity', 1);
+
+  group.append('path')
+    .datum(data)
+    .attr('fill', 'none')
+    .attr('stroke', 'red')
+    .attr('stroke-width', 2)
+    .attr('d', d3.line()
+      .x(function(d){ return x(+d.Year);})
+      .y(function(d){ return y(+d["GasolinePriceAdjustedforInflation(2023$/gallon)"]);}))
+
+  group.selectAll('.greencircle')
+    .data(data)
+    .enter()
+    .append('circle')
+    .attr("class", "greencircle")
+    .attr('cx', function(d){ return x(+d.Year);})
+    .attr('cy', function(d){ return y(+d.GasolinePrice);})
+    .attr('r', 4)
+    .style('fill', 'green')
+    .style('opacity', 1);
+
+  group.append('path')
+    .datum(data)
+    .attr('fill', 'none')
+    .attr('stroke', 'green')
+    .attr('stroke-width', 2)
+    .attr('d', d3.line()
+      .x(function(d){ return x(+d.Year);})
+      .y(function(d){ return y(+d.GasolinePrice);}));
+
+   // Tool tip logic
+   group.selectAll(".hitarea")
+   .data(data)
+   .enter()
+   .append("circle")
+   .attr("class", "hitarea")
+   .attr('cx', function(d){ return x(+d.Year);})
+   .attr('cy', function(d){ return y(+d.GasolinePrice);})
+   .attr('r', 6)
+   .style('fill', 'transparent')
+   .style("stroke", "transparent")
+   .style('pointer-events', 'all')
+   .on("mouseover", function(d){tooltip.style("opacity", 1)
+      .style("left",(d3.event.pageX + 10)+"px")
+      .style("top",(d3.event.pageY + 10)+"px")
+      .html("Year: "+d.Year+"<br>Price: "+d.GasolinePrice);
+      console.log("Hovered:", d.Year);
+      d3.select(this)
+      .style('fill', 'yellow')
+      .style('stroke', 'black')
+   })
+   .on("mouseout", function() {
+    tooltip.style("opacity", 0);
+    d3.select(this)
+      .style('fill', 'transparent')
+      .style('stroke', 'transparent')
+   });
+
+   group.selectAll(".hitarea2")
+   .data(data)
+   .enter()
+   .append("circle")
+   .attr("class", "hitarea2")
+   .attr('cx', function(d){ return x(+d.Year);})
+   .attr('cy', function(d){ return y(+d["GasolinePriceAdjustedforInflation(2023$/gallon)"]);})
+   .attr('r', 6)
+   .style('fill', 'transparent')
+   .style("stroke", "transparent")
+   .style('pointer-events', 'all')
+   .on("mouseover", function(d){tooltip.style("opacity", 1)
+      .style("left",(d3.event.pageX + 10)+"px")
+      .style("top",(d3.event.pageY + 10)+"px")
+      .html("Year: "+d.Year+"<br>Price: "+d["GasolinePriceAdjustedforInflation(2023$/gallon)"]);
+      console.log("Hovered:", d.Year);
+      d3.select(this)
+      .style('fill', 'yellow')
+      .style('stroke', 'black')
+   })
+   .on("mouseout", function() {
+    tooltip.style("opacity", 0);
+    d3.select(this)
+      .style('fill', 'transparent')
+      .style('stroke', 'transparent')
+   });
+
+}
 // Add the annotations
 
 </script>
