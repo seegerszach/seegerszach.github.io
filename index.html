@@ -21,7 +21,7 @@
 </div>
 <div name="tooltip" opacity=0></div>
 <div>
-  <svg width="900" height="900"></svg>
+  <svg width="950" height="950"></svg>
 </div>
 <script>
 
@@ -122,7 +122,8 @@ function InflationAdjusted(previousData,currentData) {
     .attr('cy', function(d){ return y(+d["GasolinePriceAdjustedforInflation(2023$/gallon)"]);})
     .attr('r', 4)
     .style('fill', 'red')
-    .style('opacity', 1);
+    .style('opacity', 1)
+    ;
 
   group.append('path')
     .datum(currentData)
@@ -133,7 +134,7 @@ function InflationAdjusted(previousData,currentData) {
       .x(function(d){ return x(+d.Year);})
       .y(function(d){ return y(+d["GasolinePriceAdjustedforInflation(2023$/gallon)"]);}))
 
-  // Tool tip logic
+  // Tool tip/hit area logic
   group.selectAll(".hitarea")
    .data(currentData)
    .enter()
@@ -150,15 +151,21 @@ function InflationAdjusted(previousData,currentData) {
       .style("top",(d3.event.pageY + 10)+"px")
       .html("Year: "+d.Year+"<br>Price: "+d["GasolinePriceAdjustedforInflation(2023$/gallon)"]);
       console.log("Hovered:", d.Year);
+      d3.select(this)
+      .style('fill', 'yellow')
+      .style('stroke', 'black')
    })
    .on("mouseout", function() {
     tooltip.style("opacity", 0);
+    d3.select(this)
+    .style('fill', 'transparent')
+    .style('stroke', 'transparent')
    });
 
    // Legend
    const legend = svg.append("g")
         .attr('class', 'inflationGroup')
-        .attr("transform", "translate(750,325)");
+        .attr("transform", "translate(750,300)");
         
         legend.append("circle")
         .attr("cx", 0)
@@ -170,6 +177,7 @@ function InflationAdjusted(previousData,currentData) {
         .attr("x", 15)
         .attr("y", 2)
         .text("Inflation-Adjusted Price")
+        .style("font-family", "Arial")
         .style("font-size", "14px")
         .attr("alignment-baseline", "middle");
 }
@@ -193,7 +201,7 @@ function ActualGasPrices(previousData,currentData)
   group.append('path')
     .datum(previousData)
     .attr('fill', 'none')
-    .attr('stroke', 'purple')
+    .attr('stroke', 'green')
     .attr('stroke-width', 2)
     .attr('d', d3.line()
       .x(function(d){ return x(+d.Year);})
@@ -214,7 +222,7 @@ function ActualGasPrices(previousData,currentData)
   group.append('path')
     .datum(currentData)
     .attr('fill', 'none')
-    .attr('stroke', 'purple')
+    .attr('stroke', 'green')
     .attr('stroke-width', 2)
     .attr('d', d3.line()
       .x(function(d){ return x(+d.Year);})
@@ -237,10 +245,37 @@ function ActualGasPrices(previousData,currentData)
       .style("top",(d3.event.pageY + 10)+"px")
       .html("Year: "+d.Year+"<br>Price: "+d.GasolinePrice);
       console.log("Hovered:", d.Year);
+      d3.select(this)
+      .style('fill', 'yellow')
+      .style('stroke', 'black')
    })
    .on("mouseout", function() {
     tooltip.style("opacity", 0);
+    d3.select(this)
+      .style('fill', 'transparent')
+      .style('stroke', 'transparent')
    });
+
+
+  // Legend
+  const legend = svg.append("g")
+  .attr("class", "legend")
+  .attr("transform", "translate(750,325)");
+
+legend.append("circle")
+  .attr("cx", 0)
+  .attr("cy", 2)
+  .attr("r", 6)
+  .style("fill", "green");
+
+legend.append("text")
+  .attr("x", 15)
+  .attr("y", 5)
+  .text("Actual Gasoline Price")
+  .style("font-family", "Arial")
+  .style("font-size", "14px")
+  .attr("alignment-baseline", "middle");
+
 }
 
 // Show next button
@@ -260,6 +295,9 @@ function showNext() {
   const previousData = data.slice(0, currentIndex + chunkSize);
   const currentData = data.slice(currentIndex, currentIndex + chunkSize);
 
+  const startYear = currentData[0].Year;
+  const endYear   = currentData[currentData.length - 1].Year;
+
   // remove them so we only apply to the latest
   svg.selectAll(".dataGroup").remove();
 
@@ -268,25 +306,10 @@ function showNext() {
   // Show the inflation related data
   InflationAdjusted(previousData,currentData);
   
+  displayYearRange(startYear,endYear);
+
+
   currentIndex += chunkSize;
-
-  // Legend
-const legend = svg.append("g")
-  .attr("class", "legend")
-  .attr("transform", "translate(750,296)");
-
-legend.append("circle")
-  .attr("cx", 0)
-  .attr("cy", 2)
-  .attr("r", 6)
-  .style("fill", "green");
-
-legend.append("text")
-  .attr("x", 15)
-  .attr("y", 5)
-  .text("Actual Gasoline Price")
-  .style("font-size", "14px")
-  .attr("alignment-baseline", "middle");
 
   if (currentIndex >= 74) 
   {
@@ -311,9 +334,17 @@ function restartVisualization()
     .attr("disabled", null); 
 }
 
-function displayYearRange()
+function displayYearRange(startYear,endYear)
 {
+  svg.selectAll(".yearLabel").remove();
 
+  svg.append("text")
+  .attr("class", "yearLabel")
+  .attr("x", 740)
+  .attr("y", 150)
+  .style("font-family", "Arial")
+  .style("font-size", "24px")
+  .text(startYear + "-" + endYear);
 }
 
 // Add the annotations
