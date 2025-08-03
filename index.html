@@ -1,19 +1,17 @@
 <html>
-<script src='https://d3js.org/d3.v5.min.js'></script>
+<script src="https://d3js.org/d3.v5.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-annotation/2.5.1/d3-annotation.min.js"></script>
 <style> circle {fill: green; stroke: black;}
         .inflationCircle {fill: red; stroke: black;}
         [name="tooltip"] {
           position: absolute;
-          opacity: 0;
           background-color: gainsboro;
           border: 1px solid #999;
           padding: 6px;
           font-size: 14px;
           pointer-events: none;
-          transition: opacity 0.3s;
 }</style>
-<body onload='init()'>
+<body onload="init()">
 <div style="position: absolute; top: 400px; left: 845px;">
   <button onclick="showNext()" id="showNext">Click To Begin</button>
 </div>
@@ -33,13 +31,9 @@ async function init() {
 y = d3.scaleLinear().domain([0.01,4.8]).range([750,0]);
 x = d3.scaleLinear().domain([1950,2025]).range([0,750]);
 
-data = await d3.csv('https://seegerszach.github.io/GasPrices.csv');
+data = await d3.csv("https://seegerszach.github.io/GasPrices.csv");
 svg = d3.select("svg");
-tooltip = d3.select("div[name='tooltip']");
-
-const t = d3.transition()
-  .duration(7500)
-  .ease(d3.easeLinear);
+tooltip = d3.select('div[name="tooltip"]');
 
 svg.append("g")
 .attr("transform","translate("+80+","+50+")")
@@ -67,7 +61,7 @@ svg.append("text")
   .attr("y", 500)
   .style("font-family", "Arial")
   .style("font-size", "12px")
-  .text("Note: Hover over active data for added details");
+  .text("Note: Hover over data points for added details");
 }
 
 function InflationAdjusted(previousData,currentData) {
@@ -76,48 +70,48 @@ function InflationAdjusted(previousData,currentData) {
   .x(function(d){ return x(+d.Year);})
   .y(function(d){ return y(+d["GasolinePriceAdjustedforInflation(2023$/gallon)"]);});
 
-  const group = svg.append('g')
-    .attr('class', 'dataGroup')
-    .attr('transform', 'translate(80,50)');
+  const group = svg.append("g")
+    .attr("class", "dataGroup")
+    .attr("transform", "translate(80,50)");
 
-  group.selectAll('circle')
+  group.selectAll("circle")
     .data(previousData)
     .enter()
-    .append('circle')
-    .attr('cx', function(d){ return x(+d.Year);})
-    .attr('cy', function(d){ return y(+d["GasolinePriceAdjustedforInflation(2023$/gallon)"]);})
-    .attr('r', 4)
-    .style('fill', 'red')
-    .style('opacity', 0.2);
+    .append("circle")
+    .attr("cx", function(d){ return x(+d.Year);})
+    .attr("cy", function(d){ return y(+d["GasolinePriceAdjustedforInflation(2023$/gallon)"]);})
+    .attr("r", 4)
+    .style("fill", "red")
+    .style("opacity", 0.2);
 
-  group.append('path')
+  group.append("path")
     .datum(previousData)
-    .attr('fill', 'none')
-    .attr('stroke', 'red')
-    .attr('stroke-width', 2)
-    .attr('d', d3.line()
+    .attr("fill", "none")
+    .attr("stroke", "red")
+    .attr("stroke-width", 2)
+    .attr("d", d3.line()
       .x(function(d){ return x(+d.Year);})
       .y(function(d){ return y(+d["GasolinePriceAdjustedforInflation(2023$/gallon)"]);}))
-    .style('opacity', 0.2);
+    .style("opacity", 0.2);
 
-  group.selectAll('.current')
+  group.selectAll(".current")
     .data(currentData)
     .enter()
-    .append('circle')
-    .attr('class', 'current')
-    .attr('cx', function(d){ return x(+d.Year);})
-    .attr('cy', function(d){ return y(+d["GasolinePriceAdjustedforInflation(2023$/gallon)"]);})
-    .attr('r', 4)
-    .style('fill', 'red')
-    .style('opacity', 1)
+    .append("circle")
+    .attr("class", "current")
+    .attr("cx", function(d){ return x(+d.Year);})
+    .attr("cy", function(d){ return y(+d["GasolinePriceAdjustedforInflation(2023$/gallon)"]);})
+    .attr("r", 4)
+    .style("fill", "red")
+    .style("opacity", 1)
     ;
 
-  group.append('path')
+  group.append("path")
     .datum(currentData)
-    .attr('fill', 'none')
-    .attr('stroke', 'red')
-    .attr('stroke-width', 2)
-    .attr('d', d3.line()
+    .attr("fill", "none")
+    .attr("stroke", "red")
+    .attr("stroke-width", 2)
+    .attr("d", d3.line()
       .x(function(d){ return x(+d.Year);})
       .y(function(d){ return y(+d["GasolinePriceAdjustedforInflation(2023$/gallon)"]);}))
 
@@ -127,31 +121,31 @@ function InflationAdjusted(previousData,currentData) {
    .enter()
    .append("circle")
    .attr("class", "hitarea")
-   .attr('cx', function(d){ return x(+d.Year);})
-   .attr('cy', function(d){ return y(+d["GasolinePriceAdjustedforInflation(2023$/gallon)"]);})
-   .attr('r', 6)
-   .style('fill', 'transparent')
+   .attr("cx", function(d){ return x(+d.Year);})
+   .attr("cy", function(d){ return y(+d["GasolinePriceAdjustedforInflation(2023$/gallon)"]);})
+   .attr("r", 6)
+   .style("fill", "transparent")
    .style("stroke", "transparent")
-   .style('pointer-events', 'all')
+   .style("pointer-events", "all")
    .on("mouseover", function(d,i){tooltip.style("opacity", 1)
       .style("left",(d3.event.pageX + 10)+"px")
       .style("top",(d3.event.pageY + 10)+"px")
       .html("Year: "+d.Year+"<br>Price: "+d["GasolinePriceAdjustedforInflation(2023$/gallon)"]);
       console.log("Hovered:", d.Year);
       d3.select(this)
-      .style('fill', 'yellow')
-      .style('stroke', 'black')
+      .style("fill", "yellow")
+      .style("stroke", "black")
    })
    .on("mouseout", function() {
     tooltip.style("opacity", 0);
     d3.select(this)
-    .style('fill', 'transparent')
-    .style('stroke', 'transparent')
+    .style("fill", "transparent")
+    .style("stroke", "transparent")
    });
 
    // Legend
    const legend = svg.append("g")
-        .attr('class', 'inflationGroup')
+        .attr("class", "inflationGroup")
         .attr("transform", "translate(845,300)");
         
         legend.append("circle")
@@ -171,47 +165,47 @@ function InflationAdjusted(previousData,currentData) {
 
 function ActualGasPrices(previousData,currentData)
 {
-  const group = svg.append('g')
-    .attr('class', 'dataGroup')
-    .attr('transform', 'translate(80,50)');
+  const group = svg.append("g")
+    .attr("class", "dataGroup")
+    .attr("transform", "translate(80,50)");
 
-  group.selectAll('circle')
+  group.selectAll("circle")
     .data(previousData)
     .enter()
-    .append('circle')
-    .attr('cx', function(d){ return x(+d.Year);})
-    .attr('cy', function(d){ return y(+d.GasolinePrice);})
-    .attr('r', 4)
-    .style('fill', 'green')
-    .style('opacity', 0.2);
+    .append("circle")
+    .attr("cx", function(d){ return x(+d.Year);})
+    .attr("cy", function(d){ return y(+d.GasolinePrice);})
+    .attr("r", 4)
+    .style("fill", "green")
+    .style("opacity", 0.2);
 
-  group.append('path')
+  group.append("path")
     .datum(previousData)
-    .attr('fill', 'none')
-    .attr('stroke', 'green')
-    .attr('stroke-width', 2)
-    .attr('d', d3.line()
+    .attr("fill", "none")
+    .attr("stroke", "green")
+    .attr("stroke-width", 2)
+    .attr("d", d3.line()
       .x(function(d){ return x(+d.Year);})
       .y(function(d){ return y(+d.GasolinePrice);}))
-    .style('opacity', 0.2);
+    .style("opacity", 0.2);
 
-  group.selectAll('.current')
+  group.selectAll(".current")
     .data(currentData)
     .enter()
-    .append('circle')
-    .attr('class', 'current')
-    .attr('cx', function(d){ return x(+d.Year);})
-    .attr('cy', function(d){ return y(+d.GasolinePrice);})
-    .attr('r', 4)
-    .style('fill', 'green')
-    .style('opacity', 1);
+    .append("circle")
+    .attr("class", "current")
+    .attr("cx", function(d){ return x(+d.Year);})
+    .attr("cy", function(d){ return y(+d.GasolinePrice);})
+    .attr("r", 4)
+    .style("fill", "green")
+    .style("opacity", 1);
 
-  group.append('path')
+  group.append("path")
     .datum(currentData)
-    .attr('fill', 'none')
-    .attr('stroke', 'green')
-    .attr('stroke-width', 2)
-    .attr('d', d3.line()
+    .attr("fill", "none")
+    .attr("stroke", "green")
+    .attr("stroke-width", 2)
+    .attr("d", d3.line()
       .x(function(d){ return x(+d.Year);})
       .y(function(d){ return y(+d.GasolinePrice);}))
 
@@ -221,26 +215,26 @@ function ActualGasPrices(previousData,currentData)
    .enter()
    .append("circle")
    .attr("class", "hitarea")
-   .attr('cx', function(d){ return x(+d.Year);})
-   .attr('cy', function(d){ return y(+d.GasolinePrice);})
-   .attr('r', 6)
-   .style('fill', 'transparent')
+   .attr("cx", function(d){ return x(+d.Year);})
+   .attr("cy", function(d){ return y(+d.GasolinePrice);})
+   .attr("r", 6)
+   .style("fill", "transparent")
    .style("stroke", "transparent")
-   .style('pointer-events', 'all')
+   .style("pointer-events", "all")
    .on("mouseover", function(d){tooltip.style("opacity", 1)
       .style("left",(d3.event.pageX + 10)+"px")
       .style("top",(d3.event.pageY + 10)+"px")
       .html("Year: "+d.Year+"<br>Price: "+d.GasolinePrice);
       console.log("Hovered:", d.Year);
       d3.select(this)
-      .style('fill', 'yellow')
-      .style('stroke', 'black')
+      .style("fill", "yellow")
+      .style("stroke", "black")
    })
    .on("mouseout", function() {
     tooltip.style("opacity", 0);
     d3.select(this)
-      .style('fill', 'transparent')
-      .style('stroke', 'transparent')
+      .style("fill", "transparent")
+      .style("stroke", "transparent")
    });
 
 
@@ -359,47 +353,47 @@ function displayYearRange(startYear,endYear)
 
 function displayAll()
 {
-  const group = svg.append('g')
-    .attr('class', 'dataGroup')
-    .attr('transform', 'translate(80,50)');
+  const group = svg.append("g")
+    .attr("class", "dataGroup")
+    .attr("transform", "translate(80,50)");
 
-  group.selectAll('.redcircle')
+  group.selectAll(".redcircle")
     .data(data)
     .enter()
-    .append('circle')
+    .append("circle")
     .attr("class", "redcircle")
-    .attr('cx', function(d){ return x(+d.Year);})
-    .attr('cy', function(d){ return y(+d["GasolinePriceAdjustedforInflation(2023$/gallon)"]);})
-    .attr('r', 4)
-    .style('fill', 'red')
-    .style('opacity', 1);
+    .attr("cx", function(d){ return x(+d.Year);})
+    .attr("cy", function(d){ return y(+d["GasolinePriceAdjustedforInflation(2023$/gallon)"]);})
+    .attr("r", 4)
+    .style("fill", "red")
+    .style("opacity", 1);
 
-  group.append('path')
+  group.append("path")
     .datum(data)
-    .attr('fill', 'none')
-    .attr('stroke', 'red')
-    .attr('stroke-width', 2)
-    .attr('d', d3.line()
+    .attr("fill", "none")
+    .attr("stroke", "red")
+    .attr("stroke-width", 2)
+    .attr("d", d3.line()
       .x(function(d){ return x(+d.Year);})
       .y(function(d){ return y(+d["GasolinePriceAdjustedforInflation(2023$/gallon)"]);}))
 
-  group.selectAll('.greencircle')
+  group.selectAll(".greencircle")
     .data(data)
     .enter()
-    .append('circle')
+    .append("circle")
     .attr("class", "greencircle")
-    .attr('cx', function(d){ return x(+d.Year);})
-    .attr('cy', function(d){ return y(+d.GasolinePrice);})
-    .attr('r', 4)
-    .style('fill', 'green')
-    .style('opacity', 1);
+    .attr("cx", function(d){ return x(+d.Year);})
+    .attr("cy", function(d){ return y(+d.GasolinePrice);})
+    .attr("r", 4)
+    .style("fill", "green")
+    .style("opacity", 1);
 
-  group.append('path')
+  group.append("path")
     .datum(data)
-    .attr('fill', 'none')
-    .attr('stroke', 'green')
-    .attr('stroke-width', 2)
-    .attr('d', d3.line()
+    .attr("fill", "none")
+    .attr("stroke", "green")
+    .attr("stroke-width", 2)
+    .attr("d", d3.line()
       .x(function(d){ return x(+d.Year);})
       .y(function(d){ return y(+d.GasolinePrice);}));
 
@@ -409,26 +403,26 @@ function displayAll()
    .enter()
    .append("circle")
    .attr("class", "hitarea")
-   .attr('cx', function(d){ return x(+d.Year);})
-   .attr('cy', function(d){ return y(+d.GasolinePrice);})
-   .attr('r', 6)
-   .style('fill', 'transparent')
+   .attr("cx", function(d){ return x(+d.Year);})
+   .attr("cy", function(d){ return y(+d.GasolinePrice);})
+   .attr("r", 6)
+   .style("fill", "transparent")
    .style("stroke", "transparent")
-   .style('pointer-events', 'all')
+   .style("pointer-events", "all")
    .on("mouseover", function(d){tooltip.style("opacity", 1)
       .style("left",(d3.event.pageX + 10)+"px")
       .style("top",(d3.event.pageY + 10)+"px")
       .html("Year: "+d.Year+"<br>Price: "+d.GasolinePrice);
       console.log("Hovered:", d.Year);
       d3.select(this)
-      .style('fill', 'yellow')
-      .style('stroke', 'black')
+      .style("fill", "yellow")
+      .style("stroke", "black")
    })
    .on("mouseout", function() {
     tooltip.style("opacity", 0);
     d3.select(this)
-      .style('fill', 'transparent')
-      .style('stroke', 'transparent')
+      .style("fill", "transparent")
+      .style("stroke", "transparent")
    });
 
    group.selectAll(".hitarea2")
@@ -436,26 +430,26 @@ function displayAll()
    .enter()
    .append("circle")
    .attr("class", "hitarea2")
-   .attr('cx', function(d){ return x(+d.Year);})
-   .attr('cy', function(d){ return y(+d["GasolinePriceAdjustedforInflation(2023$/gallon)"]);})
-   .attr('r', 6)
-   .style('fill', 'transparent')
+   .attr("cx", function(d){ return x(+d.Year);})
+   .attr("cy", function(d){ return y(+d["GasolinePriceAdjustedforInflation(2023$/gallon)"]);})
+   .attr("r", 6)
+   .style("fill", "transparent")
    .style("stroke", "transparent")
-   .style('pointer-events', 'all')
+   .style("pointer-events", "all")
    .on("mouseover", function(d){tooltip.style("opacity", 1)
       .style("left",(d3.event.pageX + 10)+"px")
       .style("top",(d3.event.pageY + 10)+"px")
       .html("Year: "+d.Year+"<br>Price: "+d["GasolinePriceAdjustedforInflation(2023$/gallon)"]);
       console.log("Hovered:", d.Year);
       d3.select(this)
-      .style('fill', 'yellow')
-      .style('stroke', 'black')
+      .style("fill", "yellow")
+      .style("stroke", "black")
    })
    .on("mouseout", function() {
     tooltip.style("opacity", 0);
     d3.select(this)
-      .style('fill', 'transparent')
-      .style('stroke', 'transparent')
+      .style("fill", "transparent")
+      .style("stroke", "transparent")
    });
 
 }
